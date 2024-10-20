@@ -39,14 +39,12 @@ public class RandomScript : MonoBehaviour
     {
         scrambleBegun = true;
         //userBlock = true;
-        for (int i = 0; i < 16; i++)
+        for (int i = 0; i < 1; i++)
         {
             int random = UnityEngine.Random.Range(1, 7);
             //print(random);
             switch (random)
             {
-                //each number corresponds to a face that is moved
-                //the number from the random generator triggers the move
                 case 1:
                     cubeManager.RotateFace("F", -Vector3.forward, cubeManager.rotationParentFront);
                     break;

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class CubeManager : MonoBehaviour
 {
-    public Transform cubeParent; // The main parent object holding all cubes
-    public Transform rotationParentFront; // Temporary parent for rotating cubes
+    public Transform cubeParent;
+    public Transform rotationParentFront; 
     public Transform rotationParentBack;
     public Transform rotationParentLeft;
     public Transform rotationParentRight;
@@ -15,22 +15,26 @@ public class CubeManager : MonoBehaviour
 
     private Dictionary<string, Collider> faceColliders = new Dictionary<string, Collider>();
 
-    public float rotationSpeed = 300f; // This value will be updated by the slider
+    public float rotationSpeed = 300f;
     public Slider speedSlider;
+
+
+    public Colour[] colourColliders;
+    private bool isCubeComplete = false;
 
     public bool isRotating = false;
     
     void Start()
     {
 
+        colourColliders = GetComponentsInChildren<Colour>();
+
         if (speedSlider != null)
         {
             speedSlider.value = rotationSpeed;
-            // Add a listener to update the speed when the slider value changes
             speedSlider.onValueChanged.AddListener(UpdateRotationSpeed);
         }
 
-        // Store colliders for each face in a dictionary
         faceColliders.Add("F", frontCollider);
         faceColliders.Add("B", backCollider);
         faceColliders.Add("L", leftCollider);
@@ -46,66 +50,63 @@ public class CubeManager : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.F))
         {
             Debug.Log("F Key pressed");
-            RotateFace("F", Vector3.forward, rotationParentFront); // Front face
+            RotateFace("F", Vector3.forward, rotationParentFront); 
         }
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.B))
         {
-            RotateFace("B", Vector3.back, rotationParentBack); // Back face
+            RotateFace("B", Vector3.back, rotationParentBack); 
         }
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.L))
         {
-            RotateFace("L", -Vector3.left, rotationParentLeft); // Left face
+            RotateFace("L", -Vector3.left, rotationParentLeft); 
         }
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.R))
         {
-            RotateFace("R", -Vector3.right, rotationParentRight); // Right face
+            RotateFace("R", -Vector3.right, rotationParentRight);
         }
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.U))
         {
-            RotateFace("U", -Vector3.up, rotationParentUp); // Up face (top)
+            RotateFace("U", -Vector3.up, rotationParentUp);
         }
         if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.D))
         {
-            RotateFace("D", -Vector3.down, rotationParentDown); // Down face (bottom)
+            RotateFace("D", -Vector3.down, rotationParentDown);
         }
 
 
-        // Detect key presses and rotate the corresponding face
         if (Input.GetKeyDown(KeyCode.F))
         {
             Debug.Log("F Key pressed");
-            RotateFace("F", -Vector3.forward, rotationParentFront); // Front face
+            RotateFace("F", -Vector3.forward, rotationParentFront);
         }
         if (Input.GetKeyDown(KeyCode.B))
         {
-            RotateFace("B", -Vector3.back, rotationParentBack); // Back face
+            RotateFace("B", -Vector3.back, rotationParentBack);
         }
         if (Input.GetKeyDown(KeyCode.L))
         {
-            RotateFace("L", Vector3.left, rotationParentLeft); // Left face
+            RotateFace("L", Vector3.left, rotationParentLeft);
         }
         if (Input.GetKeyDown(KeyCode.R))
         {
-            RotateFace("R", Vector3.right, rotationParentRight); // Right face
+            RotateFace("R", Vector3.right, rotationParentRight);
         }
         if (Input.GetKeyDown(KeyCode.U))
         {
-            RotateFace("U", Vector3.up, rotationParentUp); // Up face (top)
+            RotateFace("U", Vector3.up, rotationParentUp); 
         }
         if (Input.GetKeyDown(KeyCode.D))
         {
-            RotateFace("D", Vector3.down, rotationParentDown); // Down face (bottom)
+            RotateFace("D", Vector3.down, rotationParentDown);
         }
     }
 
     public void RotateFace(string faceKey, Vector3 rotationAxis, Transform rotParent)
     {
-        // Get the collider for the selected face
         Collider faceCollider = faceColliders[faceKey];
 
         Debug.Log($"Collider {faceKey} bounds: {faceCollider.bounds}");
 
-        // Find the cubes that are within the face collider
         Vector3 colliderCenter = faceCollider.bounds.center;
         Vector3 colliderSize = faceCollider.bounds.size;
 
@@ -127,13 +128,11 @@ public class CubeManager : MonoBehaviour
             return;
         }
 
-        // Temporarily parent the cubes to the rotationParent only after the key press
         foreach (Transform cube in faceCubes)
         {
             cube.SetParent(rotParent);
         }
 
-        // Rotate the face (in a coroutine for smooth rotation)
         isRotating = true;
         StartCoroutine(RotateFaceCoroutine(rotationAxis, faceCubes, rotParent));
     }
@@ -153,16 +152,13 @@ public class CubeManager : MonoBehaviour
             yield return null;
         }
 
-        // Snap rotation to exactly 90 degrees
         rotParent.rotation = targetRotation;
 
-        // Unparent the cubes and re-add them to the main parent
         foreach (Transform cube in faceCubes)
         {
             cube.SetParent(cubeParent);
         }
 
-        // Reset rotation parent position and rotation
         rotParent.localRotation = Quaternion.identity;
         isRotating = false;
     }
@@ -171,5 +167,26 @@ public class CubeManager : MonoBehaviour
     {
         rotationSpeed = newSpeed;
         Debug.Log("Updated Rotation Speed: " + rotationSpeed);
+    }
+
+    public void CheckCubeCompletion()
+    {
+        isCubeComplete = true; 
+
+        foreach (Colour collider in colourColliders)
+        {
+            if (!collider.IsFaceComplete())
+            {
+                isCubeComplete = false;
+                break; // No need to check further if one face is incomplete
+            }
+        }
+
+        if (isCubeComplete)
+        {
+            Debug.Log("The cube is complete!");
+            TimerDisplay timer = GameObject.Find("Canvas/Text").GetComponent<TimerDisplay>();
+            timer.StopClock(); 
+        }
     }
 }
