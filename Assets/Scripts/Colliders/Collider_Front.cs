@@ -4,69 +4,72 @@ using UnityEngine;
 
 public class Collider_Front : MonoBehaviour
 {
-    public CubeManager cubeManager;
     public Transform frontFace;
+    public CubeManager cubeManager;
     private List<Transform> cubesToRotate = new List<Transform>();
 
     private void Start()
     {
-        // Get the CubeManager component from the parent object
         cubeManager = FindObjectOfType<CubeManager>();
-    }
-
-    public void AddCubeToRotate(Transform cube)
-    {
-        if (!cubesToRotate.Contains(cube))
-        {
-            cubesToRotate.Add(cube);
-            //cube.SetParent(frontFace); // Parent the cube to the front face
-        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        // Check if the collider belongs to a piece of the Rubik's Cube
         if (other.CompareTag("Player"))
         {
-            // Add this piece to the CubeManager's list of cubes to rotate
             AddCubeToRotate(other.transform);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        // Check if the collider belongs to a piece of the Rubik's Cube
         if (other.CompareTag("Player"))
         {
-            // Remove this piece from the CubeManager's list of cubes to rotate
-            cubeManager.RemoveCubeToRotate(other.transform);
+            // Only remove cubes if they are really outside and no longer part of this face.
+            // This could use position checks if necessary, for now we just use this placeholder.
+            if (cubeManager != null && !cubeManager.IsCubePartOfCurrentRotation(other.transform))
+            {
+                cubeManager.RemoveCubeToRotate(other.transform);
+            }
+        }
+    }
+
+
+    private void AddCubeToRotate(Transform cube)
+    {
+        if (!cubesToRotate.Contains(cube))
+        {
+            cubesToRotate.Add(cube);  // Add to the list but don't parent it yet
         }
     }
 
     private void Update()
     {
         // Check for player input to rotate the front face
-        
-        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F))
         {
-            if (cubesToRotate.Count > 0)
+            if (cubesToRotate.Count > 0) // Only proceed if exactly 9 cubes are ready for rotation
             {
                 foreach (Transform cube in cubesToRotate)
                 {
-                    cube.SetParent(frontFace);
+                    cube.SetParent(frontFace);  // Only parent them when the rotation is triggered
                 }
-                cubeManager.RotateFrontCounterClockwise(cubesToRotate);
+
+                Debug.Log($"Rotating {cubesToRotate.Count} cubes");
+                cubeManager.RotateFront(cubesToRotate, frontFace); // Pass the list and the parent (face)
             }
         }
-        else if (Input.GetKeyDown(KeyCode.F))
+        else if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.F))
         {
+            //wasn't working before when equals to 9
             if (cubesToRotate.Count > 0)
             {
                 foreach (Transform cube in cubesToRotate)
                 {
                     cube.SetParent(frontFace);
                 }
-                cubeManager.RotateFront(cubesToRotate);
+
+                cubeManager.RotateFrontCounterClockwise(cubesToRotate, frontFace);
             }
         }
     }

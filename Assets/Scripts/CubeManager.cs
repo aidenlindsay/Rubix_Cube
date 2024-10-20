@@ -6,112 +6,139 @@ using UnityEngine;
 
 public class CubeManager : MonoBehaviour
 {
-    public Transform frontFace;
-    public Transform backFace;
-    public Transform leftFace;
-    public Transform rightFace;
-    public Transform upFace;
-    public Transform downFace;
-
     public Transform mainCube;
+    public float rotationSpeed = 90f;
 
-    public float rotationSpeed = 1f;
+    private Coroutine currentRotationCoroutine;
 
-    public List<Transform> cubesToRotate = new List<Transform>();
+    private List<Transform> currentlyRotatingCubes = new List<Transform>();
+    private List<Transform> cubesToRotate = new List<Transform>();
 
     public void RemoveCubeToRotate(Transform cube)
     {
+        // Check if the cube is still part of the rotation list
         if (cubesToRotate.Contains(cube))
         {
-            cubesToRotate.Remove(cube);
-            cube.SetParent(mainCube); // Unparent the cube when it exits the collider
+            cube.SetParent(mainCube); // Reassign it back to the main cube
+            cubesToRotate.Remove(cube); // Remove from the list
         }
     }
 
-    public void RotateFront(List<Transform> cubes)
+    public bool IsCubePartOfCurrentRotation(Transform cube)
     {
-        StartCoroutine(RotateFace(frontFace, Vector3.back, cubes));
+        // Check if the cube is part of the currently rotating cubes
+        return currentlyRotatingCubes.Contains(cube);
     }
 
-    public void RotateBack(List<Transform> cubes)
+    // Remove any ongoing rotation coroutine
+    private void StopCurrentRotation()
     {
-        StartCoroutine(RotateFace(backFace, Vector3.forward, cubes));
+        if (currentRotationCoroutine != null)
+        {
+            StopCoroutine(currentRotationCoroutine);
+            currentRotationCoroutine = null;
+        }
     }
 
-    public void RotateLeft(List<Transform> cubes)
+    // Rotate the front face clockwise
+    public void RotateFront(List<Transform> cubes, Transform face)
     {
-        StartCoroutine(RotateFace(leftFace, Vector3.right, cubes));
+        StopCurrentRotation(); // Ensure no other rotation is running
+        currentRotationCoroutine = StartCoroutine(RotateFace(face, Vector3.back, cubes));
     }
 
-    public void RotateRight(List<Transform> cubes)
+    public void RotateBack(List<Transform> cubes, Transform face)
     {
-        StartCoroutine(RotateFace(rightFace, Vector3.left, cubes));
+        StopCurrentRotation();
+        currentRotationCoroutine = StartCoroutine(RotateFace(face, Vector3.forward, cubes));
     }
 
-    public void RotateUp(List<Transform> cubes)
+    public void RotateLeft(List<Transform> cubes, Transform face)
     {
-        StartCoroutine(RotateFace(upFace, Vector3.up, cubes));
+        StopCurrentRotation();
+        currentRotationCoroutine = StartCoroutine(RotateFace(face, Vector3.right, cubes));
     }
 
-    public void RotateDown(List<Transform> cubes)
+    public void RotateRight(List<Transform> cubes, Transform face)
     {
-        StartCoroutine(RotateFace(downFace, Vector3.down, cubes));
+        StopCurrentRotation();
+        currentRotationCoroutine = StartCoroutine(RotateFace(face, Vector3.left, cubes));
     }
 
-    // Methods to rotate the faces counter-clockwise
-    public void RotateFrontCounterClockwise(List<Transform> cubes)
+    public void RotateUp(List<Transform> cubes, Transform face)
     {
-        StartCoroutine(RotateFace(frontFace, -Vector3.back, cubes));
+        StopCurrentRotation();
+        currentRotationCoroutine = StartCoroutine(RotateFace(face, Vector3.up, cubes));
     }
 
-    public void RotateBackCounterClockwise(List<Transform> cubes)
+    public void RotateDown(List<Transform> cubes, Transform face)
     {
-        StartCoroutine(RotateFace(backFace, -Vector3.forward, cubes));
+        StopCurrentRotation();
+        currentRotationCoroutine = StartCoroutine(RotateFace(face, Vector3.down, cubes));
     }
 
-    public void RotateLeftCounterClockwise(List<Transform> cubes)
+    // Rotate the front face counter-clockwise
+    public void RotateFrontCounterClockwise(List<Transform> cubes, Transform face)
     {
-        StartCoroutine(RotateFace(leftFace, -Vector3.right, cubes));
+        StopCurrentRotation(); // Ensure no other rotation is running
+        currentRotationCoroutine = StartCoroutine(RotateFace(face, -Vector3.back, cubes));
     }
 
-    public void RotateRightCounterClockwise(List<Transform> cubes)
+    public void RotateBackCounterClockwise(List<Transform> cubes, Transform face)
     {
-        StartCoroutine(RotateFace(rightFace, -Vector3.left, cubes));
+        StopCurrentRotation();
+        currentRotationCoroutine = StartCoroutine(RotateFace(face, -Vector3.forward, cubes));
     }
 
-    public void RotateUpCounterClockwise(List<Transform> cubes)
+    public void RotateLeftCounterClockwise(List<Transform> cubes, Transform face)
     {
-        StartCoroutine(RotateFace(upFace, -Vector3.up, cubes));
+        StopCurrentRotation();
+        currentRotationCoroutine = StartCoroutine(RotateFace(face, -Vector3.right, cubes));
     }
 
-    public void RotateDownCounterClockwise(List<Transform> cubes)
+    public void RotateRightCounterClockwise(List<Transform> cubes, Transform face)
     {
-        StartCoroutine(RotateFace(downFace, -Vector3.down, cubes));
+        StopCurrentRotation();
+        currentRotationCoroutine = StartCoroutine(RotateFace(face, -Vector3.left, cubes));
     }
 
-    private IEnumerator RotateFace(Transform face, Vector3 direction, List<Transform> cubesToRotate)
+    public void RotateUpCounterClockwise(List<Transform> cubes, Transform face)
     {
-        float totalRotation = 0f; // Keep track of the total rotation
-        float targetRotation = 90f; // Target rotation
-        float step = rotationSpeed * Time.deltaTime; // Rotation step
+        StopCurrentRotation();
+        currentRotationCoroutine = StartCoroutine(RotateFace(face, -Vector3.up, cubes));
+    }
 
-        // Continue rotating until the total rotation reaches or exceeds the target rotation
+    public void RotateDownCounterClockwise(List<Transform> cubes, Transform face)
+    {
+        StopCurrentRotation();
+        currentRotationCoroutine = StartCoroutine(RotateFace(face, -Vector3.down, cubes));
+    }
+
+    // Generic method to rotate a face
+    private IEnumerator RotateFace(Transform face, Vector3 rotationAxis, List<Transform> cubes)
+    {
+        float totalRotation = 0f;
+        float targetRotation = 90f;
+
+        // Rotate the face as a whole
         while (totalRotation < targetRotation)
         {
-            // Calculate the rotation for this frame
-            float rotationThisFrame = Mathf.Min(step, targetRotation - totalRotation);
-            face.Rotate(direction * rotationThisFrame);
-            totalRotation += rotationThisFrame; // Update the total rotation
+            float rotationThisFrame = rotationSpeed * Time.deltaTime;
+            rotationThisFrame = Mathf.Min(rotationThisFrame, targetRotation - totalRotation);
+
+            face.Rotate(rotationAxis * rotationThisFrame, Space.World); // Rotate the entire face
+            totalRotation += rotationThisFrame;
+
             yield return null; // Wait for the next frame
         }
 
-        // After rotation, unparent the cubes from the front face
-        foreach (Transform cube in cubesToRotate)
+        // After rotation is complete, return cubes to mainCube
+        foreach (Transform cube in cubes)
         {
-            cube.SetParent(mainCube); // Move back to the original hierarchy
+            cube.SetParent(mainCube);
         }
 
-        // Clear the list for the next rotation
-        cubesToRotate = new List<Transform>();
+        cubes.Clear(); // Clear the list
+        currentRotationCoroutine = null; // Reset coroutine reference
     }
 }
