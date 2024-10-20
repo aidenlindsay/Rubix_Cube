@@ -4,137 +4,55 @@ using UnityEngine;
 
 public class Collider_Up : MonoBehaviour
 {
-    public Transform Up_Parent;
-    public Transform MainCube;
-    public Transform[] counter;
-    public bool run = true;
-    public int startingCount;
-    [SerializeField]
-    public float speed = 1f;
+    public Transform upFace;
+    public CubeManager cubeManager;
+    private List<Transform> cubesToRotate = new List<Transform>();
 
-    public RandomScript randomScript;
-
-    public bool CheckForUserBlock()
+    private void Start()
     {
-        RandomScript random = GameObject.Find("Rubik's_Cube").GetComponent<RandomScript>();
-        bool block = random.userBlock;
-        return block;
+        // Get the CubeManager component from the parent object
+        cubeManager = FindObjectOfType<CubeManager>();
     }
 
-    public bool CheckForShuffle()
+    public void AddCubeToRotate(Transform cube)
     {
-        RandomScript random = GameObject.Find("Rubik's_Cube").GetComponent<RandomScript>();
-        bool shuffle = random.compUp;
-        return shuffle;
-    }
-
-    public int CheckChildNum()
-    {
-        Transform Up_Parent = GameObject.Find("Turning_Parents/Up").transform;
-        int children = Up_Parent.GetComponentInChildren<Transform>().childCount;
-        //print("Children = " + children);
-        return children;
-    }
-
-    public bool CheckIfMoving()
-    {
-        Transform Front_Parent = GameObject.Find("Turning_Parents/Front").transform;
-        bool ifMoving = Front_Parent.GetComponent<Collider_Front>().isMoving;
-        return ifMoving;
-    }
-
-    public void ChangeParent(Transform parent)
-    {
-        Transform oldParent = parent;
-        MainCube = GameObject.Find("Rubik's_Cube").transform;
-        for (int x = oldParent.childCount; x > 0; x--)
+        if (!cubesToRotate.Contains(cube))
         {
-            Transform child = oldParent.GetChild(x);
-            child.SetParent(MainCube);
+            cubesToRotate.Add(cube);
+            cube.SetParent(upFace); // Parent the cube to the front face
         }
+    }   
 
+    private void OnTriggerEnter(Collider other)
+    {
+        // Check if the collider belongs to a piece of the Rubik's Cube
+        if (other.CompareTag("Player"))
+        {
+            // Add this piece to the CubeManager's list of cubes to rotate
+            AddCubeToRotate(other.transform);
+        }
     }
 
-    public void OnTriggerStay(Collider other)
+    private void OnTriggerExit(Collider other)
     {
-        int counter = CheckChildNum();
-
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                if (Input.GetKeyDown(KeyCode.U))
-                {
-                    if (counter < 9 && run == true)
-                    {
-                        if (other.CompareTag("Player"))
-                        {
-                            Up_Parent = GameObject.Find("Turning_Parents/Up").transform;
-                            other.gameObject.transform.SetParent(Up_Parent);
-                        }
-                    }
-                    else if (counter >= 9 && run == true)
-                    {
-                        other.enabled = false;
-                        StartCoroutine(Up_Reverse_Move());
-                        run = false;
-                        other.enabled = true;
-                    }
-                }
-            }
-            else
-            {
-                if ((Input.GetKeyDown(KeyCode.U) || CheckForShuffle() == true))
-                {
-                    if (counter < 9 && run == true)
-                    {
-                        if (other.CompareTag("Player"))
-                        {
-                            Up_Parent = GameObject.Find("Turning_Parents/Up").transform;
-                            other.gameObject.transform.SetParent(Up_Parent);
-                        }
-                    }
-                    else if (counter >= 9 && run == true)
-                    {
-                        other.enabled = false;
-                        StartCoroutine(Up_Move());
-                        run = false;
-                        other.enabled = true;
-                        RandomScript random = GameObject.Find("Rubik's_Cube").
-                        GetComponent<RandomScript>();
-                        random.compUp = false;
-                    }
-                }
-            }
+        // Check if the collider belongs to a piece of the Rubik's Cube
+        if (other.CompareTag("Player"))
+        {
+            // Remove this piece from the CubeManager's list of cubes to rotate
+            cubeManager.RemoveCubeToRotate(other.transform);
+        }
     }
 
-    public IEnumerator Up_Move()
+    private void Update()
     {
-        for (int x = 0; x < 9; x++)
+        // Check for player input to rotate the up face
+        if (Input.GetKeyDown(KeyCode.U))
         {
-            Up_Parent.Rotate(0, 10, 0);
-            yield return null;
+            cubeManager.RotateUp(cubesToRotate);
         }
-        MainCube = GameObject.Find("Rubik's_Cube").transform;
-        for (int i = Up_Parent.childCount - 1; i > -1; i--)
+        else if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.U))
         {
-            Transform child = Up_Parent.GetChild(i);
-            child.SetParent(MainCube);
+            cubeManager.RotateUpCounterClockwise(cubesToRotate);
         }
-        run = true;
-    }
-
-    public IEnumerator Up_Reverse_Move()
-    {
-        for (int x = 0; x < 9; x++)
-        {
-            Up_Parent.Rotate(0, -10, 0);
-            yield return null;
-        }
-        MainCube = GameObject.Find("Rubik's_Cube").transform;
-        for (int i = Up_Parent.childCount - 1; i > -1; i--)
-        {
-            Transform child = Up_Parent.GetChild(i);
-            child.SetParent(MainCube);
-        }
-        run = true;
     }
 }

@@ -8,7 +8,6 @@ public class Colour : MonoBehaviour
     public string thisColour;
     public GameObject centreColour;
     public int colourCount = 0;
-    //public bool isComplete = false;
     public string sideComplete = "null";
     public bool greenComplete = false;
     public bool blueComplete = false;
@@ -20,7 +19,7 @@ public class Colour : MonoBehaviour
     void Start()
     {
         thisColour = GetComponentInParent<MeshRenderer>().material.ToString();
-        colourCount = 0;
+        //colourCount = 0;
     }
 
     void Update()
@@ -44,7 +43,7 @@ public class Colour : MonoBehaviour
                 //print("yup");
             }
         }   
-        print(colourCount);
+        //print(colourCount);
 
         if (colourCount == 8)
         {
