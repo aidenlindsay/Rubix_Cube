@@ -36,12 +36,13 @@ public class TimerDisplay : MonoBehaviour
     public void StartClock()
     {
         clockActive = true;
+        coroutineRunning = false;
     }
 
     public void StopClock()
     {
         clockActive = false;
-        if (coroutineRunning == false)
+        if (!coroutineRunning)
         {
             StartCoroutine(Score());
         }
@@ -50,26 +51,31 @@ public class TimerDisplay : MonoBehaviour
     public void HighscoreText()
     {
         string path = Application.dataPath + "/Highscore.txt";
+
         if (!File.Exists(path))
         {
             File.WriteAllText(path, "1000,1,1");
         }
+
         TimeSpan timeSpan = TimeSpan.FromSeconds(timeAmount);
-        string content = timeSpan.Minutes.ToString()
-            + "," + timeSpan.Seconds.ToString()
-            + "," + timeSpan.Milliseconds.ToString();
+        string content = timeSpan.Minutes.ToString("D2") + "," +
+                         timeSpan.Seconds.ToString("D2") + "," +
+                         timeSpan.Milliseconds.ToString("D3");
 
         string fileLines = File.ReadAllText(path);
-        string[] fileTotal = fileLines.Split(",".ToCharArray());
+        string[] fileTotal = fileLines.Split(',');
 
-        //compares the two times by turning the values into integers that can be compared
-        if((int.Parse(fileTotal[0])* 60000) + (int.Parse(fileTotal[1])*1000) + int.Parse(fileTotal[2])
-            >= (timeSpan.Minutes*60000) + (timeSpan.Seconds*1000) + timeSpan.Milliseconds)
-        {
-            File.WriteAllText(path, content);
-        }
-        var info = new FileInfo(path);
-        if (info.Length == 0)
+        // Convert to total milliseconds for comparison
+        int previousTime = (int.Parse(fileTotal[0]) * 60000) +
+                           (int.Parse(fileTotal[1]) * 1000) +
+                           int.Parse(fileTotal[2]);
+
+        int newTime = (timeSpan.Minutes * 60000) +
+                      (timeSpan.Seconds * 1000) +
+                      timeSpan.Milliseconds;
+
+        // Update the high score if the new time is better
+        if (newTime <= previousTime)
         {
             File.WriteAllText(path, content);
         }

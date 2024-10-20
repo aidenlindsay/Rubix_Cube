@@ -20,6 +20,13 @@ public class RandomScript : MonoBehaviour
     public bool scrambled = false;
     public bool scrambleBegun = false;
 
+    public CubeManager cubeManager;
+
+    private void Start()
+    {
+        cubeManager = GameObject.Find("CubeManager").GetComponent<CubeManager>();
+    }
+
     public void Update()
     {
         if (Input.GetKeyDown(KeyCode.S) && scrambleBegun == false)
@@ -41,25 +48,25 @@ public class RandomScript : MonoBehaviour
                 //each number corresponds to a face that is moved
                 //the number from the random generator triggers the move
                 case 1:
-                    compFront = true;
+                    cubeManager.RotateFace("F", -Vector3.forward, cubeManager.rotationParentFront);
                     break;
                 case 2:
-                    compBack = true;
+                    cubeManager.RotateFace("B", -Vector3.back, cubeManager.rotationParentBack);
                     break;
                 case 3:
-                    compLeft = true;
+                    cubeManager.RotateFace("L", Vector3.left, cubeManager.rotationParentLeft);
                     break;
                 case 4:
-                    compRight = true;
+                    cubeManager.RotateFace("R", Vector3.right, cubeManager.rotationParentRight);
                     break;
                 case 5:
-                    compUp = true;
+                    cubeManager.RotateFace("U", Vector3.up, cubeManager.rotationParentUp);
                     break;
                 case 6:
-                    compDown = true;
+                    cubeManager.RotateFace("D", Vector3.down, cubeManager.rotationParentDown);
                     break;
             }
-            yield return new WaitForSeconds(0.4f);
+            yield return new WaitUntil(() => !cubeManager.isRotating);
         }
         readyText.text = ("READY!");
         yield return new WaitForSeconds(1);

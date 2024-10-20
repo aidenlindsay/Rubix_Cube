@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class CubeManager : MonoBehaviour
@@ -13,9 +14,22 @@ public class CubeManager : MonoBehaviour
     public Collider frontCollider, backCollider, leftCollider, rightCollider, topCollider, bottomCollider;
 
     private Dictionary<string, Collider> faceColliders = new Dictionary<string, Collider>();
+
+    public float rotationSpeed = 300f; // This value will be updated by the slider
+    public Slider speedSlider;
+
+    public bool isRotating = false;
     
     void Start()
     {
+
+        if (speedSlider != null)
+        {
+            speedSlider.value = rotationSpeed;
+            // Add a listener to update the speed when the slider value changes
+            speedSlider.onValueChanged.AddListener(UpdateRotationSpeed);
+        }
+
         // Store colliders for each face in a dictionary
         faceColliders.Add("F", frontCollider);
         faceColliders.Add("B", backCollider);
@@ -27,15 +41,44 @@ public class CubeManager : MonoBehaviour
 
     void Update()
     {
-        // Detect key presses and rotate the corresponding face
-        if (Input.GetKeyDown(KeyCode.F))
+        if (isRotating) return;
+
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.F))
         {
             Debug.Log("F Key pressed");
             RotateFace("F", Vector3.forward, rotationParentFront); // Front face
         }
-        if (Input.GetKeyDown(KeyCode.B))
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.B))
         {
             RotateFace("B", Vector3.back, rotationParentBack); // Back face
+        }
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.L))
+        {
+            RotateFace("L", -Vector3.left, rotationParentLeft); // Left face
+        }
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.R))
+        {
+            RotateFace("R", -Vector3.right, rotationParentRight); // Right face
+        }
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.U))
+        {
+            RotateFace("U", -Vector3.up, rotationParentUp); // Up face (top)
+        }
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.D))
+        {
+            RotateFace("D", -Vector3.down, rotationParentDown); // Down face (bottom)
+        }
+
+
+        // Detect key presses and rotate the corresponding face
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            Debug.Log("F Key pressed");
+            RotateFace("F", -Vector3.forward, rotationParentFront); // Front face
+        }
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            RotateFace("B", -Vector3.back, rotationParentBack); // Back face
         }
         if (Input.GetKeyDown(KeyCode.L))
         {
@@ -55,7 +98,7 @@ public class CubeManager : MonoBehaviour
         }
     }
 
-    void RotateFace(string faceKey, Vector3 rotationAxis, Transform rotParent)
+    public void RotateFace(string faceKey, Vector3 rotationAxis, Transform rotParent)
     {
         // Get the collider for the selected face
         Collider faceCollider = faceColliders[faceKey];
@@ -91,15 +134,16 @@ public class CubeManager : MonoBehaviour
         }
 
         // Rotate the face (in a coroutine for smooth rotation)
+        isRotating = true;
         StartCoroutine(RotateFaceCoroutine(rotationAxis, faceCubes, rotParent));
     }
 
     System.Collections.IEnumerator RotateFaceCoroutine(Vector3 rotationAxis, List<Transform> faceCubes, Transform rotParent)
     {
         float rotationAmount = 0;
-        float rotationSpeed = 100f;
         Quaternion initialRotation = rotParent.rotation;
         Quaternion targetRotation = Quaternion.Euler(rotationAxis * 90) * initialRotation;
+        isRotating = true;
 
         while (rotationAmount < 90)
         {
@@ -120,5 +164,12 @@ public class CubeManager : MonoBehaviour
 
         // Reset rotation parent position and rotation
         rotParent.localRotation = Quaternion.identity;
+        isRotating = false;
+    }
+
+    public void UpdateRotationSpeed(float newSpeed)
+    {
+        rotationSpeed = newSpeed;
+        Debug.Log("Updated Rotation Speed: " + rotationSpeed);
     }
 }

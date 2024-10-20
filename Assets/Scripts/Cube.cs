@@ -93,13 +93,13 @@ public class Cube : MonoBehaviour
         if (isRotating) yield break;
         isRotating = true;
 
-        for (int x = 0; x < 9; x++)
+        for (int x = 0; x < 18; x++)
         {
             //the SPACE.WORLD function fixed my rotation issues, so that the rotations
             //are no longer taking place across the cubes constantly moving axis but instead
             //sin the worlds stationary axis
-            transform.Rotate(10, 0, 0, Space.World);
-            yield return new WaitForEndOfFrame();
+            transform.Rotate(5, 0, 0, Space.World);
+            yield return new WaitForSeconds(0.01f);
         }
         isRotating = false;
     }
@@ -108,10 +108,10 @@ public class Cube : MonoBehaviour
         if (isRotating) yield break;
         isRotating = true;
 
-        for (int x = 0; x < 9; x++)
+        for (int x = 0; x < 18; x++)
         {
-            this.transform.Rotate(-10, 0, 0, Space.World);
-            yield return new WaitForEndOfFrame();
+            this.transform.Rotate(-5, 0, 0, Space.World);
+            yield return new WaitForSeconds(0.01f);
         }
         isRotating = false;
     }
@@ -121,10 +121,10 @@ public class Cube : MonoBehaviour
         if (isRotating) yield break;
         isRotating = true;
 
-        for (int x = 0; x < 9; x++)
+        for (int x = 0; x < 18; x++)
         {
-            this.transform.Rotate(0, -10, 0, Space.World);
-            yield return new WaitForEndOfFrame();
+            this.transform.Rotate(0, -5, 0, Space.World);
+            yield return new WaitForSeconds(0.01f);
         }
         isRotating = false;
     }
@@ -133,10 +133,10 @@ public class Cube : MonoBehaviour
         if (isRotating) yield break;
         isRotating = true;
 
-        for (int x = 0; x < 9; x++)
+        for (int x = 0; x < 18; x++)
         {
-            transform.Rotate(0, 10, 0, Space.World);
-            yield return new WaitForEndOfFrame();
+            transform.Rotate(0, 5, 0, Space.World);
+            yield return new WaitForSeconds(0.01f);
         }
         isRotating = false;
     }
