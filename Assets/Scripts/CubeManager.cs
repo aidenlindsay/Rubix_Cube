@@ -17,7 +17,7 @@ public class CubeManager : MonoBehaviour
 
     public float rotationSpeed = 1f;
 
-    private List<Transform> cubesToRotate;
+    public List<Transform> cubesToRotate = new List<Transform>();
 
     public void RemoveCubeToRotate(Transform cube)
     {
@@ -50,43 +50,43 @@ public class CubeManager : MonoBehaviour
 
     public void RotateUp(List<Transform> cubes)
     {
-        StartCoroutine(RotateFace(upFace, Vector3.left, cubes));
+        StartCoroutine(RotateFace(upFace, Vector3.up, cubes));
     }
 
     public void RotateDown(List<Transform> cubes)
     {
-        StartCoroutine(RotateFace(downFace, Vector3.right, cubes));
+        StartCoroutine(RotateFace(downFace, Vector3.down, cubes));
     }
 
     // Methods to rotate the faces counter-clockwise
     public void RotateFrontCounterClockwise(List<Transform> cubes)
     {
-        StartCoroutine(RotateFace(frontFace, Vector3.forward, cubes));
+        StartCoroutine(RotateFace(frontFace, -Vector3.back, cubes));
     }
 
     public void RotateBackCounterClockwise(List<Transform> cubes)
     {
-        StartCoroutine(RotateFace(backFace, Vector3.back, cubes));
+        StartCoroutine(RotateFace(backFace, -Vector3.forward, cubes));
     }
 
     public void RotateLeftCounterClockwise(List<Transform> cubes)
     {
-        StartCoroutine(RotateFace(leftFace, Vector3.left, cubes));
+        StartCoroutine(RotateFace(leftFace, -Vector3.right, cubes));
     }
 
     public void RotateRightCounterClockwise(List<Transform> cubes)
     {
-        StartCoroutine(RotateFace(rightFace, Vector3.right, cubes));
+        StartCoroutine(RotateFace(rightFace, -Vector3.left, cubes));
     }
 
     public void RotateUpCounterClockwise(List<Transform> cubes)
     {
-        StartCoroutine(RotateFace(upFace, Vector3.right, cubes));
+        StartCoroutine(RotateFace(upFace, -Vector3.up, cubes));
     }
 
     public void RotateDownCounterClockwise(List<Transform> cubes)
     {
-        StartCoroutine(RotateFace(downFace, Vector3.left, cubes));
+        StartCoroutine(RotateFace(downFace, -Vector3.down, cubes));
     }
 
     private IEnumerator RotateFace(Transform face, Vector3 direction, List<Transform> cubesToRotate)
@@ -112,6 +112,6 @@ public class CubeManager : MonoBehaviour
         }
 
         // Clear the list for the next rotation
-        cubesToRotate.Clear();
+        cubesToRotate = new List<Transform>();
     }
 }

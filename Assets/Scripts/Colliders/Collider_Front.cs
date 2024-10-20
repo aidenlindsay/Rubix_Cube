@@ -19,7 +19,7 @@ public class Collider_Front : MonoBehaviour
         if (!cubesToRotate.Contains(cube))
         {
             cubesToRotate.Add(cube);
-            cube.SetParent(frontFace); // Parent the cube to the front face
+            //cube.SetParent(frontFace); // Parent the cube to the front face
         }
     }
 
@@ -46,13 +46,28 @@ public class Collider_Front : MonoBehaviour
     private void Update()
     {
         // Check for player input to rotate the front face
-        if (Input.GetKeyDown(KeyCode.F))
+        
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.F))
         {
-            cubeManager.RotateFront(cubesToRotate);
+            if (cubesToRotate.Count > 0)
+            {
+                foreach (Transform cube in cubesToRotate)
+                {
+                    cube.SetParent(frontFace);
+                }
+                cubeManager.RotateFrontCounterClockwise(cubesToRotate);
+            }
         }
-        else if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.F))
+        else if (Input.GetKeyDown(KeyCode.F))
         {
-            cubeManager.RotateFrontCounterClockwise(cubesToRotate);
+            if (cubesToRotate.Count > 0)
+            {
+                foreach (Transform cube in cubesToRotate)
+                {
+                    cube.SetParent(frontFace);
+                }
+                cubeManager.RotateFront(cubesToRotate);
+            }
         }
     }
 }

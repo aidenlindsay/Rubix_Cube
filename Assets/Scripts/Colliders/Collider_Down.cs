@@ -19,7 +19,7 @@ public class Collider_Down : MonoBehaviour
         if (!cubesToRotate.Contains(cube))
         {
             cubesToRotate.Add(cube);
-            cube.SetParent(downFace); // Parent the cube to the front face
+            //cube.SetParent(downFace); // Parent the cube to the front face
         }
     }
 
@@ -48,11 +48,25 @@ public class Collider_Down : MonoBehaviour
         // Check for player input to rotate the up face
         if (Input.GetKeyDown(KeyCode.D))
         {
-            cubeManager.RotateDown(cubesToRotate);
+            if (cubesToRotate.Count > 0)
+            {
+                foreach (Transform cube in cubesToRotate)
+                {
+                    cube.SetParent(downFace);
+                }
+                cubeManager.RotateDown(cubesToRotate);
+            }
         }
         else if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.D))
         {
-            cubeManager.RotateDownCounterClockwise(cubesToRotate);
+            if (cubesToRotate.Count > 0)
+            {
+                foreach (Transform cube in cubesToRotate)
+                {
+                    cube.SetParent(downFace);
+                }
+                cubeManager.RotateDownCounterClockwise(cubesToRotate);
+            }
         }
     }
 }
